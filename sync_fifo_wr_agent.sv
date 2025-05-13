@@ -16,8 +16,11 @@ class sync_fifo_wr_agent extends uvm_agent;
 		super.build_phase(phase);
 		wr_mon = sync_fifo_wr_mon::type_id::create("wr_mon",this);
 
+//`uvm_info("Debug",$sformatf("#### %0t Before getting wr_cfg in wr_agent ####",$time),UVM_HIGH)
 		if(!uvm_config_db#(sync_fifo_wr_agent_config)::get(this,"","WR_CFG",wr_cfg))
 			`uvm_fatal(get_full_name(),"!!!! Unable to get wr_cfg in sync_fifo_wr_agent !!!!")
+
+//`uvm_info("Debug",$sformatf("#### %0t After getting wr_cfg in wr_agent ####",$time),UVM_HIGH)
 
 		if(wr_cfg.is_active==UVM_ACTIVE)begin
 		//if(get_is_active()==UVM_ACTIVE)begin		//bit type

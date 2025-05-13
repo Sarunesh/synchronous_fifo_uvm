@@ -16,8 +16,11 @@ class sync_fifo_rd_agent extends uvm_agent;
 		super.build_phase(phase);
 		rd_mon = sync_fifo_rd_mon::type_id::create("rd_mon",this);
 
+//`uvm_info("Debug",$sformatf("#### %0t Before getting rd_cfg in rd_agent ####",$time),UVM_HIGH)
 		if(!uvm_config_db#(sync_fifo_rd_agent_config)::get(this,"","RD_CFG",rd_cfg))
 			`uvm_fatal(get_full_name(),"!!!! Unable to get rd_cfg in sync_fifo_rd_agent !!!!")
+
+//`uvm_info("Debug",$sformatf("#### %0t After getting rd_cfg in rd_agent ####",$time),UVM_HIGH)
 
 		if(rd_cfg.is_active == UVM_ACTIVE)begin
 			rd_sqr = sync_fifo_rd_sqr::type_id::create("rd_sqr",this);
