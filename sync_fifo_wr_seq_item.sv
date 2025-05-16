@@ -6,8 +6,8 @@ class sync_fifo_wr_seq_item extends uvm_sequence_item;
 	
 //Factory registration
 	`uvm_object_utils_begin(sync_fifo_wr_seq_item)
-		`uvm_field_int(wdata,UVM_ALL_ON)
 		`uvm_field_int(wr_en,UVM_ALL_ON)
+		`uvm_field_int(wdata,UVM_ALL_ON)
 		`uvm_field_int(wr_err,UVM_ALL_ON)
 	`uvm_object_utils_end
 

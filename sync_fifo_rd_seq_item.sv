@@ -6,9 +6,9 @@ class sync_fifo_rd_seq_item extends uvm_sequence_item;
 	
 	//Factory registration
 	`uvm_object_utils_begin(sync_fifo_rd_seq_item)
+		`uvm_field_int(rd_en,UVM_ALL_ON)
 		`uvm_field_int(rdata,UVM_ALL_ON)
 		`uvm_field_int(rd_err,UVM_ALL_ON)
-		`uvm_field_int(rd_en,UVM_ALL_ON)
 	`uvm_object_utils_end
 
 	//Constructor

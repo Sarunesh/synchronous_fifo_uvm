@@ -1,5 +1,5 @@
 class sync_fifo_env_config extends uvm_object;
-	//Factory registration
+//Factory registration
 	`uvm_object_utils(sync_fifo_env_config)
 
 	sync_fifo_wr_agent_config wr_cfg;
@@ -7,7 +7,7 @@ class sync_fifo_env_config extends uvm_object;
 	bit has_wr_subscriber=1;
 	bit has_rd_subscriber=1;
 
-	//Constructor
+//Constructor
 	//`NEW_OBJECT
 	function new(string name="sync_fifo_env_config");
 		super.new(name);

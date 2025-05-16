@@ -1,59 +1,60 @@
-`uvm_analysis_imp_decl(_wr)
-`uvm_analysis_imp_decl(_rd)
 class sync_fifo_sbd extends uvm_scoreboard;
-//Factory registration
+//Factory Registration
 	`uvm_component_utils(sync_fifo_sbd)
 
 //Constructor
 	`NEW_COMPONENT
 
-//Port declaration
-	uvm_analysis_imp_wr#(sync_fifo_wr_seq_item,sync_fifo_sbd) wr_imp;
-	uvm_analysis_imp_rd#(sync_fifo_rd_seq_item,sync_fifo_sbd) rd_imp;
-
-//Seq_items
-	sync_fifo_wr_seq_item wr_tx;
-	sync_fifo_rd_seq_item rd_tx;
+//TLM FIFOs for analysis ports
+	uvm_tlm_analysis_fifo #(sync_fifo_wr_seq_item) wr_fifo;
+	uvm_tlm_analysis_fifo #(sync_fifo_rd_seq_item) rd_fifo;
 
 //Properties
-	bit wr_flag, rd_flag;
-	bit [WIDTH-1:0] temp;
 	bit [WIDTH-1:0] fifo[$];
+	bit [WIDTH-1:0] temp;
 
-//build_phase
+//Build Phase
 	virtual function void build_phase(uvm_phase phase);
 		super.build_phase(phase);
-		wr_imp=new("wr_imp",this);
-		rd_imp=new("rd_imp",this);
-		`uvm_info("SYNC_FIFO_SBD","Inside build_phase of sync_fifo_sbd",UVM_HIGH)
-	endfunction: build_phase
-
-//run_phase
+		`uvm_info(get_type_name(),
+			"Inside build_phase of sync_fifo_sbd",
+			UVM_HIGH)
+		
+		wr_fifo = new("wr_fifo", this);
+		rd_fifo = new("rd_fifo", this);
+	endfunction
+	
+//Run Phase
 	virtual task run_phase(uvm_phase phase);
 		super.run_phase(phase);
-		forever begin
-			wait(wr_flag || rd_flag);
-			fork
-				if(wr_tx.wr_en && !wr_tx.wr_err)begin
+		fork
+//Write transaction handler
+			forever begin
+				sync_fifo_wr_seq_item wr_tx;
+				wr_fifo.get(wr_tx);
+				if (wr_tx.wr_en && !wr_tx.wr_err) begin
 					fifo.push_back(wr_tx.wdata);
+					`uvm_info(get_type_name(),
+						$sformatf("Pushed: %0h", wr_tx.wdata),
+						UVM_MEDIUM)
 				end
-				if(rd_tx.rd_en && !rd_tx.rd_err)begin
-					temp = fifo.pop_front();
-					if(rd_tx.rdata == temp) sync_fifo_common::match_count++;
-					else sync_fifo_common::mismatch_count++;
+			end
+			
+//Read transaction handler
+			forever begin
+				sync_fifo_rd_seq_item rd_tx;
+				rd_fifo.get(rd_tx);
+				if (rd_tx.rd_en && !rd_tx.rd_err) begin
+					if (fifo.size() > 0) begin
+						temp = fifo.pop_front();
+						if (rd_tx.rdata == temp) sync_fifo_common::match_count++;
+						else sync_fifo_common::mismatch_count++;
+					end
+				else
+					`uvm_warning(get_type_name(),
+						"Read attempted from empty model FIFO")
 				end
-			join
-		end
-	endtask: run_phase
-
-//write method
-	virtual function void write_wr(sync_fifo_wr_seq_item wr_t);
-		$cast(wr_tx,wr_t);
-		wr_flag=1;
-	endfunction: write_wr
-
-	virtual function void write_rd(sync_fifo_rd_seq_item rd_t);
-		$cast(rd_tx,rd_t);
-		rd_flag=1;
-	endfunction: write_rd
-endclass: sync_fifo_sbd
+			end
+		join
+	endtask
+endclass : sync_fifo_sbd

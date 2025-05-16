@@ -1,6 +1,6 @@
 package common_pkg;
-	parameter WIDTH=16;
-	parameter DEPTH=16;
+	parameter WIDTH=4;
+	parameter DEPTH=4;
 	parameter DATA_RANGE=(2**WIDTH)-1;
 
 	class sync_fifo_common;

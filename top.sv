@@ -19,18 +19,18 @@ module top;
 	//Clock generation
 	always #5 clk=~clk;
 
-	//Set interface to config db
-	initial
-		uvm_config_db#(virtual sync_fifo_intf)::set(null,"","VIF",pif);
-
 	//Initialization
 	initial begin
 		clk=0; rst=1;
 		repeat(2)@(posedge clk);
 		rst=0;
+		#1000 $finish;
 	end
 
 	//run_test
-	initial
-		run_test("base_test");
+	initial begin
+		//Set interface to config db
+		uvm_config_db#(virtual sync_fifo_intf)::set(null,"*","VIF",pif);
+		run_test();
+	end
 endmodule: top

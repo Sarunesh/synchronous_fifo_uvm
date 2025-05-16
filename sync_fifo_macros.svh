@@ -15,9 +15,24 @@
 `endif
 
 `ifndef CONNECT_IF_NOT_NULL
-`define CONNECT_IF_NOT_NULL(src,dst) \
-	if(src!=null && dst!=null) \
-		src.connect(dst); \
-	else \
-		`uvm_warning("NULL_CONNECT",$sformatf("!!!! Connection failed: %0s or %0s is null",`"src`",`"dst`"))
+`define CONNECT_IF_NOT_NULL(src,dst)													\
+	if(src!=null && dst!=null)															\
+		src.connect(dst);																\
+	else begin																			\
+		if(!src && !dst)																\
+			`uvm_warning("NULL_CONNECT",$sformatf("!!!! Connection failed: %0s and %0s are null",`"src`",`"dst`"))																	   \
+		else if(!src && dst)															\
+			`uvm_warning("NULL_CONNECT",$sformatf("!!!! Connection failed: %0s is null",`"src`"))																					   \
+		else																			\
+			`uvm_warning("NULL_CONNECT",$sformatf("!!!! Connection failed: %0s is null",`"dst`"))																					   \
+	end
+`endif
+
+`ifndef UVM_NULL_CHECK
+`define UVM_NULL_CHECK(HANDLE, CONTEXT) \
+    if (!(HANDLE)) begin \
+        `uvm_error(CONTEXT, `"!!!! HANDLE is null !!!!`") \
+    end else begin \
+        `uvm_info(CONTEXT, $sformatf(">>>> %0t Created: %0s <<<<", $time, `"HANDLE`"), UVM_DEBUG) \
+    end
 `endif
